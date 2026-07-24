@@ -15,7 +15,7 @@ const footerCols = [
     links: [
       { label: 'About Us', to: '/about' },
       { label: "Director's Message", to: '/director-message' },
-      { label: 'ERP Departments', to: '/erp-departments' },
+      { label: 'KICS Departments', to: '/kics-departments' },
       { label: 'Jobs at KICS', to: '/jobs' },
     ],
   },
@@ -32,7 +32,7 @@ const footerCols = [
     links: [
       { label: 'Conferences', to: '/conferences' },
       { label: 'Workshops', to: '/workshops' },
-      { label: 'e-Rozgar Program', to: '/e-rozgaar' },
+      // { label: 'e-Rozgar Program', to: '/e-rozgaar' },
       { label: 'News & Updates', to: '/news' },
     ],
   },

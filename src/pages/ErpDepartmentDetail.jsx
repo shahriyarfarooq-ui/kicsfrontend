@@ -98,20 +98,20 @@ export default function ErpDepartmentDetail() {
       <SEO
         title={department ? `${department.name} Projects` : 'ERP Department Projects'}
         description="View projects for the selected ERP department."
-        breadcrumbs={[{ label: 'Home', url: '/' }, { label: 'ERP Departments', url: '/erp-departments' }, { label: department?.name || 'Department' }]}
+        breadcrumbs={[{ label: 'Home', url: '/' }, { label: 'ERP Departments', url: '/kics-departments' }, { label: department?.name || 'Department' }]}
       />
 
       <PageHero
         title={department ? `${department.name} Projects` : 'ERP Department Projects'}
         subtitle="Explore the projects associated with the selected ERP department."
-        breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'ERP Departments', to: '/erp-departments' }, { label: department?.name || 'Department' }]}
+        breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'ERP Departments', to: '/kics-departments' }, { label: department?.name || 'Department' }]}
       />
 
       <section className="py-16 bg-slate-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <Link
-              to="/erp-departments"
+              to="/kics-departments"
               className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition-colors hover:border-primary-300 hover:text-primary-700"
             >
               <FiArrowLeft size={16} /> Back to Departments

@@ -211,7 +211,7 @@ export default function DirectorMessage() {
               )}
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <Link to="/erp-departments" className="btn-primary">Kics Departments</Link>
+                <Link to="/kics-departments" className="btn-primary">KICS Departments</Link>
                 <Link to="/about" className="btn-primary">About KICS</Link>
               </div>
             </AnimateOnScroll>

@@ -155,7 +155,7 @@ export default function ErpEmployees() {
       <SEO
         title="Staff Directory"
         description="Browse current staff members and research lab assignments at KICS UET Lahore."
-        breadcrumbs={[{ label: 'Home', url: '/' }, { label: 'Staff', url: '/erp-employees' }]}
+        breadcrumbs={[{ label: 'Home', url: '/' }, { label: 'Staff', url: '/kics-employees' }]}
       />
 
       <PageHero

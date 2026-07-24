@@ -85,10 +85,10 @@ export default function App() {
                 <Route path="/"                  element={<Home />} />
                 <Route path="/about"             element={<About />} />
                 <Route path="/director-message"  element={<DirectorMessage />} />
-                <Route path="/staff"             element={<Navigate to="/erp-employees" replace />} />
+                <Route path="/staff"             element={<Navigate to="/kics-employees" replace />} />
                 {/* Legacy /StaffPage path (case-insensitive links) */}
-                <Route path="/StaffPage"         element={<Navigate to="/erp-departments" replace />} />
-                <Route path="/staff/:id"          element={<Navigate to="/erp-departments" replace />} />
+                <Route path="/StaffPage"         element={<Navigate to="/kics-departments" replace />} />
+                <Route path="/staff/:id"          element={<Navigate to="/kics-departments" replace />} />
                 <Route path="/research-areas"    element={<ResearchAreas />} />
                 <Route path="/research-areas/:code" element={<ResearchAreaDetail />} />
                 <Route path="/publications"      element={<Publications />} />
@@ -101,9 +101,9 @@ export default function App() {
                 <Route path="/services"          element={<Services />} />
                 <Route path="/news"              element={<News />} />
                 <Route path="/news/:id"           element={<NewsDetail />} />
-                <Route path="/erp-departments"    element={<ErpDepartments />} />
-                <Route path="/erp-departments/:id" element={<ErpDepartmentDetail />} />
-                <Route path="/erp-employees"     element={<ErpEmployees />} />
+                <Route path="/kics-departments"    element={<ErpDepartments />} />
+                <Route path="/kics-departments/:id" element={<ErpDepartmentDetail />} />
+                <Route path="/kics-employees"     element={<ErpEmployees />} />
                 <Route path="/technology-centers" element={<TechnologyCenters />} />
                 <Route path="/research-projects" element={<ResearchProjects />} />
                 <Route path="/seminars"          element={<Seminars />} />

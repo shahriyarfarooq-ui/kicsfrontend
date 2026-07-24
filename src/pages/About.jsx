@@ -204,7 +204,7 @@ export default function About() {
             <h2 className="section-title mb-4">Explore More</h2>
             <p className="text-slate-500 mb-8">Learn about our research, team, and opportunities.</p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link to="/erp-departments" className="btn-primary">ERP Departments</Link>
+              <Link to="/kics-departments" className="btn-primary">ERP Departments</Link>
               <Link to="/director-message" className="btn-primary">Director's Message</Link>
               <Link to="/research-areas" className="btn-primary">Research Labs</Link>
             </div>

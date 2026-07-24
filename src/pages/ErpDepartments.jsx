@@ -63,13 +63,13 @@ export default function ErpDepartments() {
       <SEO
         title="ERP Departments"
         description="Browse ERP departments synced from the KICS API."
-        breadcrumbs={[{ label: 'Home', url: '/' }, { label: 'ERP Departments', url: '/erp-departments' }]}
+        breadcrumbs={[{ label: 'Home', url: '/' }, { label: 'KICS Departments', url: '/kics-departments' }]}
       />
 
       <PageHero
         title="LABS"
         subtitle="View the departments loaded from the ERP system and inspect their project counts."
-        breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'ERP Departments' }]}
+        breadcrumbs={[{ label: 'Home', to: '/' }, { label: 'KICS Departments' }]}
       />
 
       <section className="py-16 bg-slate-50">
@@ -125,7 +125,7 @@ export default function ErpDepartments() {
 
                       <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                         <Link
-                          to={`/erp-departments/${department.id}`}
+                          to={`/kics-departments/${department.id}`}
                           state={{ department }}
                           className="inline-flex items-center justify-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 transition-colors"
                         >
