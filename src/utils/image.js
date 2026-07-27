@@ -12,7 +12,14 @@ const encodeUrl = (url) => {
   }
 };
 
-const withApiBase = (path) => `${API_BASE_URL}/${path.replace(/^\/+/, '')}`;
+// ✅ FIX: Create a storage URL without /api
+const getStorageBaseUrl = () => {
+  // Remove /api from the end of API_BASE_URL
+  const base = API_BASE_URL.replace(/\/api$/, '').replace(/\/api\/$/, '');
+  return base;
+};
+
+const withStorageBase = (path) => `${getStorageBaseUrl()}/${path.replace(/^\/+/, '')}`;
 
 export const buildImageUrl = (value, fallback = DEFAULT_IMAGE_FALLBACK) => {
   if (value === null || value === undefined) return fallback;
@@ -34,15 +41,18 @@ export const buildImageUrl = (value, fallback = DEFAULT_IMAGE_FALLBACK) => {
     .replace(/^storage\/app\/public\//i, 'storage/')
     .replace(/^app\/public\//i, 'storage/');
 
+  // Check if it's already a storage path
   if (/^\/?(?:storage|uploads)\//i.test(normalized)) {
-    return encodeUrl(withApiBase(normalized));
+    // Use storage base URL (without /api)
+    return encodeUrl(withStorageBase(normalized));
   }
 
   if (normalized.startsWith('/')) {
     return encodeUrl(normalized);
   }
 
-  return encodeUrl(withApiBase(`storage/${normalized}`));
+  // Default: add storage prefix and use storage base URL
+  return encodeUrl(withStorageBase(`storage/${normalized}`));
 };
 
 export const getImageLoadingProps = ({

@@ -1,6 +1,38 @@
-import { buildImageUrl } from './image';
+// ─── IMAGE HELPER ───
+export const buildImageUrl = (path, fallback = null) => {
+  if (!path) {
+    return fallback || null;
+  }
 
-export { buildImageUrl, DEFAULT_IMAGE_FALLBACK } from './image';
+  // If it's already a full URL, return as is
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+
+  // If it starts with /storage/, it's already in the correct format
+  if (path.startsWith('/storage/')) {
+    return `https://demo.kics.edu.pk${path}`;
+  }
+
+  // Remove any leading slashes
+  const cleanPath = path.replace(/^\/+/, '');
+
+  // Base URL for storage - NO /api prefix
+  const baseUrl = 'https://demo.kics.edu.pk/adminkics/public/storage/';
+
+  return baseUrl + cleanPath;
+};
+
+export const DEFAULT_IMAGE_FALLBACK = 'https://placehold.co/600x400/4a1209/fae3de?text=KICS+Image';
+
+export const getImageLoadingProps = ({ eager = false, priority = 'low', sizes = '100vw' } = {}) => {
+  return {
+    loading: eager ? 'eager' : 'lazy',
+    decoding: 'async',
+    sizes,
+    fetchpriority: priority,
+  };
+};
 
 export const stripHtml = (value = '') =>
   String(value || '')
@@ -37,20 +69,8 @@ export const mapNewsItem = (item = {}) => ({
   raw: item,
 });
 
-// export const mapStaffMember = (person = {}) => ({
-//   id: person.id || person.people_id,
-//   name: person.name || [person.fname, person.lname].filter(Boolean).join(' ') || 'KICS Staff',
-//   title: person.title || person.designation || person.post || 'Staff Member',
-//   dept: person.dept || person.department || person.group || 'KICS',
-//   email: person.email || '',
-//   image: buildImageUrl(person.image, ''),
-//   bio: person.bio || truncateText(person.biography || person.research_interest, 140) || 'KICS team member.',
-//   researchInterest: person.research_interest || '',
-//   raw: person,
-// });
 export const mapStaffMember = (person = {}) => ({
   id: person.people_id || person.id,
-
   name:
     person.name ||
     [person.fname, person.lname]
@@ -58,25 +78,20 @@ export const mapStaffMember = (person = {}) => ({
       .join(' ')
       .trim() ||
     'KICS Staff',
-
   title:
     person.designation?.designation_name ||
     person.post?.post_name ||
     person.title ||
     'Staff Member',
-
   dept:
     person.group?.group_name ||
     person.department ||
     'KICS',
-
   email: person.email || '',
-
   image: buildImageUrl(
     person.image_name || person.image,
     ''
   ),
-
   bio:
     truncateText(
       person.biography ||
@@ -84,9 +99,7 @@ export const mapStaffMember = (person = {}) => ({
       '',
       140
     ) || 'KICS team member.',
-
   researchInterest: person.research_interest || '',
-
   raw: person,
 });
 
