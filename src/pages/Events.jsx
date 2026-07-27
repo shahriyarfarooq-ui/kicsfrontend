@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { FiSearch, FiCalendar, FiFilter, FiX } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
+import { FiSearch, FiCalendar, FiFilter, FiX, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import PageHero from '../components/PageHero';
 import EventCard from '../components/EventCard';
 import SEO from '../components/SEO';
 import { eventService } from '../services/eventService';
-import { getTypeLabel } from '../utils/dateUtils';
+import { getTypeLabel, getStatusColor, getStatusLabel, getTime, formatDate, getCalendarDays } from '../utils/dateUtils';
 
 const EVENT_TYPES = ['all', 'conference', 'workshop', 'seminar', 'summit', 'training', 'social'];
 
@@ -20,6 +21,14 @@ export default function Events() {
     last_page: 1,
     total: 0
   });
+
+  // Calendar state
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth() + 1;
+  const monthName = currentDate.toLocaleString('default', { month: 'long' });
 
   useEffect(() => {
     fetchEvents();
@@ -69,6 +78,43 @@ export default function Events() {
            (event.location && event.location.toLowerCase().includes(searchLower));
   });
 
+  // ─── Calendar Functions ───
+  const getEventsForDate = (date) => {
+    const dateStr = date.toDateString();
+    return events.filter(event => {
+      const eventDate = new Date(event.start_date);
+      return eventDate.toDateString() === dateStr;
+    });
+  };
+
+  const hasEvents = (date) => {
+    return getEventsForDate(date).length > 0;
+  };
+
+  const goToPrevMonth = () => {
+    setCurrentDate(new Date(year, month - 2, 1));
+    setSelectedDate(null);
+  };
+
+  const goToNextMonth = () => {
+    setCurrentDate(new Date(year, month, 1));
+    setSelectedDate(null);
+  };
+
+  const goToToday = () => {
+    setCurrentDate(new Date());
+    setSelectedDate(null);
+  };
+
+  const goToMonth = (year, month) => {
+    setCurrentDate(new Date(year, month - 1, 1));
+    setSelectedDate(null);
+  };
+
+  const selectedDateEvents = selectedDate ? getEventsForDate(selectedDate) : [];
+
+  const calendarDays = getCalendarDays(year, month);
+
   return (
     <div>
       <SEO
@@ -86,10 +132,187 @@ export default function Events() {
       <section className="py-12 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           
-          {/* Filters */}
+          {/* ─── CALENDAR SECTION ─── */}
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+            {/* Calendar Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-4 sm:px-6 py-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={goToPrevMonth}
+                    className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors"
+                  >
+                    <FiChevronLeft size={18} />
+                  </button>
+                  <h2 className="text-lg sm:text-xl font-bold text-white min-w-[140px] text-center">
+                    {monthName} {year}
+                  </h2>
+                  <button
+                    onClick={goToNextMonth}
+                    className="p-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors"
+                  >
+                    <FiChevronRight size={18} />
+                  </button>
+                </div>
+                <button
+                  onClick={goToToday}
+                  className="px-4 py-1.5 bg-white text-blue-700 rounded-lg hover:bg-blue-50 transition-colors text-sm font-semibold"
+                >
+                  Today
+                </button>
+              </div>
+            </div>
+
+            {/* Month Navigation Quick Links */}
+            <div className="flex flex-wrap gap-1 px-4 py-3 border-b border-slate-200">
+              {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m, i) => {
+                const monthNum = i + 1;
+                const isActive = monthNum === month;
+                return (
+                  <button
+                    key={i}
+                    onClick={() => goToMonth(year, monthNum)}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all ${
+                      isActive
+                        ? 'bg-blue-600 text-white shadow-md'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    {m}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Calendar Grid */}
+            <div className="p-4">
+              <div className="grid grid-cols-7 gap-1">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                  <div key={day} className="py-2 text-center text-xs font-semibold text-slate-600">
+                    {day}
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-7 gap-1 mt-1">
+                {calendarDays.map((day, index) => {
+                  const dayEvents = getEventsForDate(day.date);
+                  const isToday = day.date.toDateString() === new Date().toDateString();
+                  const isSelected = selectedDate && day.date.toDateString() === selectedDate.toDateString();
+                  const hasEvent = dayEvents.length > 0;
+
+                  return (
+                    <div
+                      key={index}
+                      onClick={() => {
+                        if (hasEvent) {
+                          setSelectedDate(day.date);
+                        }
+                      }}
+                      className={`
+                        min-h-[60px] sm:min-h-[70px] p-1.5 rounded-lg cursor-pointer transition-all
+                        ${!day.isCurrentMonth ? 'bg-slate-50/50 text-slate-400' : 'hover:bg-blue-50'}
+                        ${isToday ? 'bg-blue-50 border-2 border-blue-500' : ''}
+                        ${isSelected ? 'ring-2 ring-blue-500 ring-inset' : ''}
+                        ${hasEvent ? 'cursor-pointer' : 'cursor-default'}
+                      `}
+                    >
+                      <div className="flex items-start justify-between">
+                        <span className={`
+                          text-sm font-semibold
+                          ${!day.isCurrentMonth ? 'text-slate-400' : 'text-slate-700'}
+                          ${isToday ? 'text-blue-600' : ''}
+                        `}>
+                          {day.date.getDate()}
+                        </span>
+                        {hasEvent && (
+                          <span className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0 mt-1" />
+                        )}
+                      </div>
+
+                      {day.isCurrentMonth && dayEvents.length > 0 && (
+                        <div className="mt-1 space-y-0.5">
+                          {dayEvents.slice(0, 1).map(event => (
+                            <div
+                              key={event.id}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                window.location.href = `/events/${event.slug}`;
+                              }}
+                              className="text-[8px] sm:text-[9px] text-blue-600 truncate hover:underline cursor-pointer bg-blue-50/80 px-1 py-0.5 rounded"
+                            >
+                              {event.title.length > 12 ? event.title.substring(0, 12) + '…' : event.title}
+                            </div>
+                          ))}
+                          {dayEvents.length > 1 && (
+                            <span className="text-[8px] sm:text-[9px] text-slate-400 px-1">
+                              +{dayEvents.length - 1} more
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* ─── SELECTED DATE EVENTS ─── */}
+          {selectedDate && selectedDateEvents.length > 0 && (
+            <div className="bg-white rounded-2xl shadow-lg overflow-hidden mb-8">
+              <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-4 sm:px-6 py-3">
+                <h3 className="text-lg font-bold text-white">
+                  Events on {formatDate(selectedDate, 'MMMM D, YYYY')}
+                </h3>
+                <p className="text-blue-100 text-sm">
+                  {selectedDateEvents.length} event{selectedDateEvents.length !== 1 ? 's' : ''} found
+                </p>
+              </div>
+              <div className="p-4 sm:p-6 space-y-3">
+                {selectedDateEvents.map(event => (
+                  <Link
+                    key={event.id}
+                    to={`/events/${event.slug}`}
+                    className="block p-4 border border-slate-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all group"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <h4 className="font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
+                            {event.title}
+                          </h4>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold bg-${getStatusColor(event.event_status) === 'blue' ? 'blue' : getStatusColor(event.event_status) === 'green' ? 'green' : getStatusColor(event.event_status) === 'red' ? 'red' : 'gray'}-100 text-${getStatusColor(event.event_status) === 'blue' ? 'blue' : getStatusColor(event.event_status) === 'green' ? 'green' : getStatusColor(event.event_status) === 'red' ? 'red' : 'gray'}-700`}>
+                            {getStatusLabel(event.event_status)}
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
+                          <span className="flex items-center gap-1">
+                            <FiCalendar size={14} />
+                            {getTime(event.start_date)}
+                            {event.end_date && ` - ${getTime(event.end_date)}`}
+                          </span>
+                          {event.location && (
+                            <span className="flex items-center gap-1">
+                              <FiCalendar size={14} />
+                              {event.location}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <span className="text-sm font-semibold text-blue-600 group-hover:translate-x-1 transition-transform">
+                        View Details →
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ─── EVENT LIST FILTERS ─── */}
           <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-8">
             <div className="flex flex-wrap items-center gap-4">
-              {/* Search */}
               <div className="relative flex-1 min-w-[200px]">
                 <FiSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
                 <input
@@ -109,7 +332,6 @@ export default function Events() {
                 )}
               </div>
 
-              {/* Type Filter */}
               <div className="flex items-center gap-2">
                 <FiFilter className="text-slate-400" size={18} />
                 <select
@@ -125,7 +347,6 @@ export default function Events() {
                 </select>
               </div>
 
-              {/* Status Filter */}
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
@@ -135,7 +356,6 @@ export default function Events() {
                 <option value="upcoming">Upcoming Only</option>
               </select>
 
-              {/* Results Count */}
               {!loading && (
                 <span className="text-sm text-slate-500 ml-auto">
                   {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''} found
@@ -144,7 +364,7 @@ export default function Events() {
             </div>
           </div>
 
-          {/* Loading */}
+          {/* ─── EVENT LIST ─── */}
           {loading && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3, 4, 5, 6].map(i => (
@@ -161,7 +381,6 @@ export default function Events() {
             </div>
           )}
 
-          {/* Error */}
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
               <p className="text-red-600">{error}</p>
@@ -174,7 +393,6 @@ export default function Events() {
             </div>
           )}
 
-          {/* Events Grid */}
           {!loading && !error && (
             <>
               {filteredEvents.length > 0 ? (
@@ -201,7 +419,6 @@ export default function Events() {
                 </div>
               )}
 
-              {/* Pagination */}
               {pagination.last_page > 1 && (
                 <div className="flex justify-center gap-2 mt-8">
                   <button

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { FiCalendar, FiMapPin, FiClock, FiArrowRight } from 'react-icons/fi';
 import { formatDate, getTime, getStatusColor, getStatusLabel, getTypeIcon, getTypeLabel } from '../utils/dateUtils';
+import { buildImageUrl } from '../utils/contentMappers';
 
 const EventCard = ({ event, featured = false }) => {
   const { 
@@ -21,15 +22,18 @@ const EventCard = ({ event, featured = false }) => {
   const statusLabel = getStatusLabel(event_status);
   const typeIcon = getTypeIcon(event_type);
   const typeLabel = getTypeLabel(event_type);
+  
+  // Use buildImageUrl to get the correct image path
+  const imageUrl = featured_image ? buildImageUrl(featured_image) : null;
 
   return (
     <div className={`group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border ${featured ? 'border-amber-400' : 'border-slate-200'} hover:border-blue-300 h-full flex flex-col`}>
       
       {/* Image Section */}
       <div className="relative w-full h-48 sm:h-56 overflow-hidden bg-gradient-to-br from-blue-600 to-blue-800">
-        {featured_image ? (
+        {imageUrl ? (
           <img
-            src={`https://demo.kics.edu.pk/adminkics/public/storage/${featured_image}`}
+            src={imageUrl}
             alt={title}
             className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
             onError={(e) => {

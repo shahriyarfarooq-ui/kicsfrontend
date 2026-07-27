@@ -5,6 +5,7 @@ import { FaFacebook, FaTwitter, FaLinkedin, FaWhatsapp } from 'react-icons/fa';
 import SEO from '../components/SEO';
 import LoadingScreen from '../components/LoadingScreen';
 import { eventService } from '../services/eventService';
+import { buildImageUrl } from '../utils/contentMappers';
 import { formatDate, getTime, getStatusColor, getStatusLabel, getTypeIcon, getTypeLabel } from '../utils/dateUtils';
 
 export default function EventDetail() {
@@ -12,6 +13,7 @@ export default function EventDetail() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     fetchEvent();
@@ -59,23 +61,30 @@ export default function EventDetail() {
   const statusLabel = getStatusLabel(event.event_status);
   const typeIcon = getTypeIcon(event.event_type);
   const typeLabel = getTypeLabel(event.event_type);
+  
+  // Use buildImageUrl for images
+  const featuredImage = event.featured_image ? buildImageUrl(event.featured_image) : null;
+  const galleryImages = event.gallery_images?.map(img => buildImageUrl(img)) || [];
 
   return (
     <div>
       <SEO
         title={event.meta_title || event.title}
         description={event.meta_description || event.description?.slice(0, 160)}
-        image={event.featured_image ? `https://demo.kics.edu.pk/adminkics/public/storage/${event.featured_image}` : null}
+        image={featuredImage}
       />
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-r from-blue-900 to-blue-700 text-white py-16 overflow-hidden">
         <div className="absolute inset-0 opacity-30">
-          {event.featured_image && (
+          {featuredImage && (
             <img
-              src={`https://demo.kics.edu.pk/adminkics/public/storage/${event.featured_image}`}
+              src={featuredImage}
               alt={event.title}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.src = 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=1200&h=400&fit=crop';
+              }}
             />
           )}
           <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-blue-800/80 to-transparent" />
@@ -158,16 +167,19 @@ export default function EventDetail() {
               )}
 
               {/* Gallery */}
-              {event.gallery_images && event.gallery_images.length > 0 && (
+              {galleryImages.length > 0 && (
                 <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8">
                   <h2 className="text-xl font-bold text-slate-800 mb-4">Gallery</h2>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {event.gallery_images.map((image, index) => (
+                    {galleryImages.map((image, index) => (
                       <img
                         key={index}
-                        src={`https://demo.kics.edu.pk/adminkics/public/storage/${image}`}
+                        src={image}
                         alt={`Gallery ${index + 1}`}
                         className="w-full h-32 object-cover rounded-lg hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          e.target.src = 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=300&h=200&fit=crop';
+                        }}
                       />
                     ))}
                   </div>
@@ -177,8 +189,7 @@ export default function EventDetail() {
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              {/* Event Details Card */}
-              <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 sticky top-24">
+              <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
                 <h3 className="font-bold text-slate-800 mb-4">Event Details</h3>
                 
                 <dl className="space-y-3 text-sm">
