@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { FiCalendar, FiArrowLeft, FiShare2, FiUser, FiTag } from 'react-icons/fi';
+import { FiCalendar, FiArrowLeft, FiShare2, FiTag } from 'react-icons/fi';
 import { FaFacebook, FaTwitter, FaLinkedin, FaWhatsapp } from 'react-icons/fa';
 import PageHero from '../components/PageHero';
 import SEO from '../components/SEO';
 import { newsService } from '../services';
+import { buildImageUrl } from '../utils/contentMappers';
 
 export default function NewsDetail() {
   const { id } = useParams();
@@ -14,7 +15,6 @@ export default function NewsDetail() {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
-    // Reset state when ID changes
     setLoading(true);
     setError('');
     setImageLoaded(false);
@@ -23,6 +23,10 @@ export default function NewsDetail() {
       try {
         const data = await newsService.get(id);
         if (data) {
+          // Ensure image has full URL
+          if (data.image) {
+            data.image = buildImageUrl(data.image);
+          }
           setNews(data);
         } else {
           setError('News article not found.');
@@ -58,29 +62,20 @@ export default function NewsDetail() {
         
         <section className="pt-4 pb-16 bg-white">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            {/* Skeleton Loader */}
             <div className="animate-pulse">
-              {/* Image Skeleton */}
               <div className="w-full h-64 sm:h-80 md:h-96 bg-slate-200 rounded-2xl mb-6" />
-              
-              {/* Title Skeleton */}
               <div className="h-8 bg-slate-200 rounded-lg w-3/4 mb-3" />
               <div className="h-8 bg-slate-200 rounded-lg w-1/2 mb-4" />
-              
-              {/* Meta Skeleton */}
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-4 bg-slate-200 rounded w-24" />
                 <div className="h-4 bg-slate-200 rounded w-32" />
               </div>
-              
-              {/* Content Skeleton */}
               <div className="space-y-3">
                 <div className="h-4 bg-slate-200 rounded w-full" />
                 <div className="h-4 bg-slate-200 rounded w-full" />
                 <div className="h-4 bg-slate-200 rounded w-3/4" />
                 <div className="h-4 bg-slate-200 rounded w-full" />
                 <div className="h-4 bg-slate-200 rounded w-5/6" />
-                <div className="h-4 bg-slate-200 rounded w-full" />
               </div>
             </div>
           </div>
@@ -144,7 +139,7 @@ export default function NewsDetail() {
           {news.image && (
             <div className="relative w-full h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-lg mb-6 bg-slate-100">
               <img
-                src={`https://demo.kics.edu.pk/adminkics/public/storage/${news.image}`}
+                src={news.image}
                 alt={news.title}
                 className={`w-full h-full object-cover transition-opacity duration-300 ${
                   imageLoaded ? 'opacity-100' : 'opacity-0'
@@ -181,7 +176,7 @@ export default function NewsDetail() {
           </div>
 
           {/* ── Content ── */}
-          <div className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-p:text-slate-600 prose-p:leading-relaxed prose-p:mb-4 prose-strong:text-slate-800 prose-ul:text-slate-600 prose-li:text-slate-600">
+          <div className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-p:text-slate-600 prose-p:leading-relaxed prose-p:mb-4 prose-strong:text-slate-800">
             {news.description ? (
               <div dangerouslySetInnerHTML={{ __html: news.description }} />
             ) : (
@@ -201,7 +196,7 @@ export default function NewsDetail() {
                   href={shareLinks.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-[#1877f2] hover:bg-[#166fe5] text-white flex items-center justify-center transition-all hover:scale-110 shadow-md hover:shadow-lg"
+                  className="w-10 h-10 rounded-full bg-[#1877f2] hover:bg-[#166fe5] text-white flex items-center justify-center transition-all hover:scale-110 shadow-md"
                   aria-label="Share on Facebook"
                 >
                   <FaFacebook size={18} />
@@ -210,7 +205,7 @@ export default function NewsDetail() {
                   href={shareLinks.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-[#000] hover:bg-[#1a1a1a] text-white flex items-center justify-center transition-all hover:scale-110 shadow-md hover:shadow-lg"
+                  className="w-10 h-10 rounded-full bg-[#000] hover:bg-[#1a1a1a] text-white flex items-center justify-center transition-all hover:scale-110 shadow-md"
                   aria-label="Share on Twitter"
                 >
                   <FaTwitter size={18} />
@@ -219,7 +214,7 @@ export default function NewsDetail() {
                   href={shareLinks.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-[#0a66c2] hover:bg-[#0958a9] text-white flex items-center justify-center transition-all hover:scale-110 shadow-md hover:shadow-lg"
+                  className="w-10 h-10 rounded-full bg-[#0a66c2] hover:bg-[#0958a9] text-white flex items-center justify-center transition-all hover:scale-110 shadow-md"
                   aria-label="Share on LinkedIn"
                 >
                   <FaLinkedin size={18} />
@@ -228,7 +223,7 @@ export default function NewsDetail() {
                   href={shareLinks.whatsapp}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-[#25D366] hover:bg-[#1da851] text-white flex items-center justify-center transition-all hover:scale-110 shadow-md hover:shadow-lg"
+                  className="w-10 h-10 rounded-full bg-[#25D366] hover:bg-[#1da851] text-white flex items-center justify-center transition-all hover:scale-110 shadow-md"
                   aria-label="Share on WhatsApp"
                 >
                   <FaWhatsapp size={18} />
@@ -238,7 +233,7 @@ export default function NewsDetail() {
                     navigator.clipboard.writeText(shareUrl);
                     alert('Link copied to clipboard!');
                   }}
-                  className="w-10 h-10 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 flex items-center justify-center transition-all hover:scale-110 shadow-md hover:shadow-lg"
+                  className="w-10 h-10 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-700 flex items-center justify-center transition-all hover:scale-110 shadow-md"
                   aria-label="Copy link"
                 >
                   <FiShare2 size={16} />
@@ -247,8 +242,8 @@ export default function NewsDetail() {
             </div>
           </div>
 
-          {/* ── Related / Back Navigation ── */}
-          <div className="mt-8 pt-6 border-t border-slate-200 flex flex-col sm:flex-row justify-between items-center gap-4">
+          {/* ── Back Navigation ── */}
+          <div className="mt-8 pt-6 border-t border-slate-200">
             <Link
               to="/news"
               className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-semibold transition-colors group"
@@ -256,12 +251,6 @@ export default function NewsDetail() {
               <FiArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
               All News
             </Link>
-            <a
-              href="#top"
-              className="inline-flex items-center gap-2 text-slate-500 hover:text-primary-600 transition-colors"
-            >
-              Back to Top ↑
-            </a>
           </div>
         </div>
       </section>
