@@ -2,6 +2,7 @@
 export const formatDate = (date, format = 'MMM D, YYYY') => {
   if (!date) return '';
   const d = new Date(date);
+  if (isNaN(d.getTime())) return '';
   
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const month = months[d.getMonth()];
@@ -11,9 +12,11 @@ export const formatDate = (date, format = 'MMM D, YYYY') => {
   const minutes = d.getMinutes().toString().padStart(2, '0');
   
   return format
+    .replace('MMMM', month)
     .replace('MMM', month)
     .replace('MM', String(d.getMonth() + 1).padStart(2, '0'))
     .replace('M', d.getMonth() + 1)
+    .replace('DDDD', ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][d.getDay()])
     .replace('DDD', ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][d.getDay()])
     .replace('DD', String(day).padStart(2, '0'))
     .replace('D', day)

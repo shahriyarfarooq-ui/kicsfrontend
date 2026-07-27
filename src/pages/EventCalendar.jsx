@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FiChevronLeft, FiChevronRight, FiCalendar, FiMapPin, FiClock, FiX, FiArrowRight } from 'react-icons/fi';
 import { eventService } from '../services/eventService';
 import { formatDate, getTime, getStatusColor, getStatusLabel, getCalendarDays } from '../utils/dateUtils';
-import { buildImageUrl } from '../utils/contentMappers';
+import { buildImageUrl } from '../utils/image';
 
 export default function EventCalendar() {
   const navigate = useNavigate();
@@ -139,7 +139,7 @@ export default function EventCalendar() {
         </div>
       </div>
 
-      {/* Month Navigation Quick Links */}
+      {/* Month Navigation */}
       <div className="flex flex-wrap gap-1 px-4 py-3 border-b border-slate-200">
         {['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'].map((m, i) => {
           const monthNum = i + 1;
@@ -236,9 +236,9 @@ export default function EventCalendar() {
           
           {/* Popup */}
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
-            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden pointer-events-auto animate-scaleIn">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden pointer-events-auto animate-scaleIn">
               {/* Popup Header */}
-              <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between">
+              <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4 flex items-center justify-between flex-shrink-0">
                 <div>
                   <h3 className="text-lg font-bold text-white">
                     {formatDate(selectedDate, 'EEEE, MMMM D, YYYY')}
@@ -255,81 +255,86 @@ export default function EventCalendar() {
                 </button>
               </div>
 
-              {/* Popup Body */}
+              {/* Popup Body - Scrollable */}
               <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
-                <div className="space-y-4">
-                  {selectedDateEvents.map((event) => {
-                    const imageUrl = buildImageUrl(event.featured_image);
-                    return (
-                      <div
-                        key={event.id}
-                        onClick={() => handleEventClick(event.slug)}
-                        className="group block border border-slate-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all cursor-pointer overflow-hidden"
-                      >
-                        <div className="flex flex-col sm:flex-row">
-                          {/* Event Image - Full width on mobile, 40% on desktop */}
-                          {imageUrl ? (
+                {selectedDateEvents.length === 0 ? (
+                  <p className="text-slate-500 text-center py-8">No events on this day.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {selectedDateEvents.map((event) => {
+                      const imageUrl = buildImageUrl(event.featured_image);
+                      return (
+                        <div
+                          key={event.id}
+                          onClick={() => handleEventClick(event.slug)}
+                          className="group block border border-slate-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all cursor-pointer overflow-hidden"
+                        >
+                          <div className="flex flex-col sm:flex-row">
+                            {/* Event Image */}
                             <div className="w-full sm:w-2/5 h-48 sm:h-auto bg-slate-100 overflow-hidden flex-shrink-0">
-                              <img
-                                src={imageUrl}
-                                alt={event.title}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                                onError={(e) => {
-                                  e.target.style.display = 'none';
-                                }}
-                              />
-                            </div>
-                          ) : (
-                            <div className="w-full sm:w-2/5 h-48 sm:h-auto bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center flex-shrink-0">
-                              <FiCalendar className="text-white/50 text-5xl" />
-                            </div>
-                          )}
-                          
-                          {/* Event Details */}
-                          <div className="flex-1 p-4 sm:p-5">
-                            <div className="flex flex-wrap items-center gap-2 mb-2">
-                              <h4 className="text-base sm:text-lg font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
-                                {event.title}
-                              </h4>
-                              <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold bg-${getStatusColor(event.event_status) === 'blue' ? 'blue' : getStatusColor(event.event_status) === 'green' ? 'green' : getStatusColor(event.event_status) === 'red' ? 'red' : 'gray'}-100 text-${getStatusColor(event.event_status) === 'blue' ? 'blue' : getStatusColor(event.event_status) === 'green' ? 'green' : getStatusColor(event.event_status) === 'red' ? 'red' : 'gray'}-700`}>
-                                {getStatusLabel(event.event_status)}
-                              </span>
-                              {event.is_featured && (
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">
-                                  ⭐ Featured
-                                </span>
+                              {imageUrl ? (
+                                <img
+                                  src={imageUrl}
+                                  alt={event.title}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                  onError={(e) => {
+                                    e.target.style.display = 'none';
+                                    e.target.parentElement.style.background = 'linear-gradient(135deg, #3b82f6, #1d4ed8)';
+                                  }}
+                                />
+                              ) : (
+                                <div className="w-full h-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
+                                  <FiCalendar className="text-white/50 text-5xl" />
+                                </div>
                               )}
                             </div>
                             
-                            <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500 mb-3">
-                              <span className="flex items-center gap-1">
-                                <FiClock size={14} />
-                                {getTime(event.start_date)}
-                                {event.end_date && ` - ${getTime(event.end_date)}`}
-                              </span>
-                              {event.location && (
-                                <span className="flex items-center gap-1">
-                                  <FiMapPin size={14} />
-                                  {event.location}
+                            {/* Event Details */}
+                            <div className="flex-1 p-4 sm:p-5">
+                              <div className="flex flex-wrap items-center gap-2 mb-2">
+                                <h4 className="text-base sm:text-lg font-bold text-slate-800 group-hover:text-blue-600 transition-colors line-clamp-2">
+                                  {event.title}
+                                </h4>
+                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold bg-${getStatusColor(event.event_status) === 'blue' ? 'blue' : getStatusColor(event.event_status) === 'green' ? 'green' : getStatusColor(event.event_status) === 'red' ? 'red' : 'gray'}-100 text-${getStatusColor(event.event_status) === 'blue' ? 'blue' : getStatusColor(event.event_status) === 'green' ? 'green' : getStatusColor(event.event_status) === 'red' ? 'red' : 'gray'}-700`}>
+                                  {getStatusLabel(event.event_status)}
                                 </span>
+                                {event.is_featured && (
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">
+                                    ⭐ Featured
+                                  </span>
+                                )}
+                              </div>
+                              
+                              <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500 mb-3">
+                                <span className="flex items-center gap-1">
+                                  <FiClock size={14} />
+                                  {getTime(event.start_date)}
+                                  {event.end_date && ` - ${getTime(event.end_date)}`}
+                                </span>
+                                {event.location && (
+                                  <span className="flex items-center gap-1">
+                                    <FiMapPin size={14} />
+                                    {event.location}
+                                  </span>
+                                )}
+                              </div>
+
+                              {event.description && (
+                                <p className="text-sm text-slate-600 line-clamp-2 mb-3">
+                                  {event.description}
+                                </p>
                               )}
-                            </div>
 
-                            {event.description && (
-                              <p className="text-sm text-slate-600 line-clamp-2 mb-3">
-                                {event.description}
-                              </p>
-                            )}
-
-                            <div className="flex items-center gap-2 text-sm font-semibold text-blue-600 group-hover:translate-x-1 transition-transform">
-                              View Details <FiArrowRight size={14} />
+                              <div className="flex items-center gap-2 text-sm font-semibold text-blue-600 group-hover:translate-x-1 transition-transform">
+                                View Details <FiArrowRight size={14} />
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
           </div>
