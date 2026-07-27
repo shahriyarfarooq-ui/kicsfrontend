@@ -77,10 +77,12 @@ export default {
         float:            'float 3s ease-in-out infinite',
         'pulse-glow':     'pulse-glow 2s ease-in-out infinite',
         pulse2:           'pulse2 2s ease-in-out infinite',
-        shimmer:          'shimmer 2s linear infinite',
+        shimmer:          'shimmer 2s ease-in-out infinite',
         'rotate-slow':    'rotate-slow 20s linear infinite',
         'bounce-gentle':  'bounce-gentle 2s ease-in-out infinite',
         'gradient-shift': 'gradient-shift 8s ease infinite',
+        // ✅ Added for skeleton loader
+        'shimmer':        'shimmer 1.5s ease-in-out infinite',
       },
       keyframes: {
         marquee:      { '0%': { transform: 'translateX(0%)' }, '100%': { transform: 'translateX(-50%)' } },
@@ -105,6 +107,11 @@ export default {
           '0%':   { backgroundPosition: '0% 50%' },
           '50%':  { backgroundPosition: '100% 50%' },
           '100%': { backgroundPosition: '0% 50%' },
+        },
+        // ✅ Added for skeleton loader
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
         },
       },
       transitionDuration: { 400: '400ms' },
