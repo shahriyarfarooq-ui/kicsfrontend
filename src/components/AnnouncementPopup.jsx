@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FiX, FiExternalLink } from "react-icons/fi";
-import CyberVision from '../assets/images/c-v.png';
+import CyberVision from '../assets/images/c-v.jpeg';
 
 const AnnouncementPopup = () => {
   const [isVisible, setIsVisible] = useState(true);

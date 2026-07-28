@@ -750,7 +750,7 @@ textarea:focus-visible,
 select:focus-visible {
   outline: 3px solid #06b6d4;
   outline-offset: 0;
-  border-color: #06b6d4;
+  border-color: #07b2d1;
 }
 
 /* Screen reader only class */
